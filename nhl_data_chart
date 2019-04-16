@@ -1,0 +1,149 @@
+
+<div >
+  <head>
+      
+  <!-- Plotly.js -->
+   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<body>
+  <div class="container">
+
+  <br>
+
+</div>
+  <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+  <div id='graph',style="background-color:#17BECF"> </div>
+  <script>
+    Plotly.d3.csv("https://raw.githubusercontent.com/iampotential/csv/master/graphable_hockey.csv", function(err, rows){
+
+  function unpack(rows, key) {
+  return rows.map(function(row) { return row[key]; });
+  }
+
+  // header values
+  var headerNames = Plotly.d3.keys(rows[0]);
+  var headerValues = [headerNames[9],headerNames[6],
+                      headerNames[8],headerNames[2],headerNames[3]];
+
+  // cell values
+  var cellValues = [];
+  for (i = 0; i < headerValues.length; i++) {
+    cellValue = unpack(rows, headerValues[i]);
+    cellValues[i] = cellValue;
+  }
+
+  // clean date
+  for (i = 0; i < cellValues[0].length; i++) {
+  var dateValue = cellValues[0][i].split(' ')[0]
+  cellValues[0][i] = dateValue
+  }
+  
+  // create table
+  var table = {
+    type: 'table',
+    columnwidth: [0,800,800,600,600],
+    columnorder: [0,1,2,3,4],
+    header: {
+      values: ["",'team away','team home','score away','score home'],
+        fill: {color: ['#17BECF', '#9748a1']},
+      align: "center",
+      line: {width: 1, color: 'white'},
+      font: {family: "Courier New", size: 14, color: "white"}
+    },
+    cells: {
+      values: cellValues,
+      align: ["center", "center"],
+      line: {color: "white", width: 1},
+      fill: {color: ['#A9CCE3', '#A9CCE3']},
+      font: {family: "Courier New", size: 10, color: ["white"]}
+    },
+    xaxis: 'x',
+    yaxis: 'y',
+    domain: {x: [0,0.23], y: [0,1]}
+  }
+
+  // create 1st plot
+ 
+  var trace1 = {
+    x: unpack(rows, 'updated'),
+    y: unpack(rows, 'rolling_under'),
+    xaxis: 'x1',
+    yaxis: 'y1',
+    hovertext: unpack(rows, 'full_String'),
+    hoverinfo:"text",
+    mode: 'lines',
+    line: {width: 2, color: '#9748a1'},
+    name: 'Rolling under results'
+  }
+  // create 2nd plot
+  var trace2 = {
+    x: unpack(rows, 'updated'),
+    y: unpack(rows, 'rolling_over'),
+    xaxis: 'x2',
+    yaxis: 'y2',
+    mode: 'lines',
+    line: {width: 2, color: 'white'},
+    name: 'rolling over'
+  }
+  var trace3 = {
+    x: unpack(rows, 'updated'),
+    y: unpack(rows, 'hockey_score_total_away'),
+    xaxis: 'x3',
+    yaxis: 'y3',
+    mode: 'markers',
+    marker: {color: 'white'},
+    name: 'away score'
+  }
+  var trace4 = {
+    x: unpack(rows, 'updated'),
+    y: unpack(rows, 'hockey_score_total_home'),
+    xaxis: 'x3',
+    yaxis: 'y3',
+    mode: 'markers',
+    marker: {color: '#9748a1'},
+    name: 'home score'
+  }
+
+
+  var data = [table,trace1,trace2,trace3,trace4]
+
+  // define subplot axes
+  var axis = {
+    showline: true,
+    zeroline: false,
+    showgrid: true,
+    mirror:true,
+    ticklen: 4,
+    tickfont: {size: 10},
+  }
+
+  var axis1 = {domain: [0.50, 1], anchor: 'y1', tickprefix: '$',showticklabels: false}
+  var axis2 = {domain: [0.50, 1], anchor: 'y2', tickprefix: '$',showticklabels: true}
+  var axis11 = {domain: [0.0, .5],anchor: 'y3', showticklabels: true}
+  var axis4 = {domain: [0.27, 0.64],anchor: 'x1',tickprefix: '$',}
+  var axis5 = {domain: [0.64, .99],anchor: 'x2', tickprefix: '$',}
+  var axis12 = {domain: [0.27, .99],anchor: 'x3', showticklabels: false}
+  // define layout
+  var layout = {
+    title: "NHL Over under results",
+    font: {family: "Courier New", size: 14, color: "black"},
+    plot_bgcolor:'#A9CCE3',
+    hovermode:'closest',
+    showlegend: false,
+    yaxis1: Object.assign(axis1,axis),
+    yaxis2: Object.assign(axis2,axis),
+    yaxis3: Object.assign(axis11,axis),
+    xaxis1: Object.assign(axis4,axis),
+    xaxis2: Object.assign(axis5,axis),
+    xaxis3: Object.assign(axis12,axis),
+    
+  }
+
+  Plotly.plot('graph', data, layout,{showSendToCloud: false,displayModeBar: false,responsive: true});
+
+});
+
+  </script>
+</body>
+
+
